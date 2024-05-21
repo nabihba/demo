@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #4CAF50;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .recipe {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .recipe h2 {
+            color: #4CAF50;
+        }
+        .recipe p, .recipe ul, .recipe ol {
+            color: #333;
+        }
+        .recipe ul, .recipe ol {
+            padding-left: 20px;
+        }
+        .description {
+            margin-top: 20px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Recipe Details</h1>
+    <div class="recipe">
+        <h2 id="recipeName"></h2>
+        <p class="description" id="recipeDescription"></p>
+        <p><strong>Ingredients:</strong></p>
+        <ul id="ingredientsList"></ul>
+        <p><strong>Instructions:</strong></p>
+        <ol id="instructionsList"></ol>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    // JavaScript code to fetch and display recipe details
+    $(document).ready(function() {
+        // Assume you have the recipe data available in a JavaScript object named 'recipeData'
+        var recipeData = {
+            recipeName: "Example Recipe",
+            description: "This is a delicious recipe that you'll love!",
+            ingredients: ["Ingredient 1", "Ingredient 2", "Ingredient 3"],
+            instructions: ["Step 1: Lorem ipsum dolor sit amet.",
+                           "Step 2: Consectetur adipiscing elit.",
+                           "Step 3: Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]
+        };
+
+        // Populate recipe details
+        $("#recipeName").text(recipeData.recipeName);
+        $("#recipeDescription").text(recipeData.description);
+        recipeData.ingredients.forEach(function(ingredient) {
+            $("#ingredientsList").append("<li>" + ingredient + "</li>");
+        });
+        recipeData.instructions.forEach(function(instruction) {
+            $("#instructionsList").append("<li>" + instruction + "</li>");
+        });
+    });
+</script>
+</body>
+</html>

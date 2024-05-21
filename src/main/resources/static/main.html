@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page</title>
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css'>
+    <style>
+        body {
+            margin-top: 20px;
+            color: #1a202c;
+            text-align: left;
+            background-color: #e2e8f0;
+            font-family: Arial, sans-serif;
+        }
+        .header {
+            background-color: #4CAF50;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            color: white;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        .btn-green {
+            background-color: #4CAF50;
+            border-color: #4CAF50;
+            color: white;
+        }
+        .btn-green:hover {
+            background-color: #45a049;
+            border-color: #45a049;
+        }
+        h1, h2, h5, h6 {
+            color: #4CAF50;
+        }
+        .recipe-card {
+            cursor: pointer;
+        }
+        .footer {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Recipe Sharing</h1>
+        <div>
+            <a href="signup.html" class="btn btn-green mr-2">Sign Up</a>
+            <a href="login.html" class="btn btn-green mr-2">Log In</a>
+            <a href="wait.html" class="btn btn-green">Add Recipe</a>
+            <a href="contact.html" class="btn btn-green">Contact Us</a>
+        </div>
+    </div>
+
+    <div class="main-body">
+        <div class="card">
+            <div class="card-body">
+                <h2>Welcome to Recipe Sharing!</h2>
+                <p>Discover and share amazing recipes with our community. Whether you are a novice cook or a seasoned chef, you'll find something to inspire your culinary adventures.</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Featured Recipe</h5>
+                <div id="featuredRecipe" class="row">
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Popular Recipes</h5>
+                <div id="popularRecipes" class="row">
+                    <!-- Popular recipe cards will be appended here by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- All Recipes -->
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">All Recipes</h5>
+                <div id="recipeList" class="row">
+                    <!-- Recipe cards will be appended here by JavaScript -->
+                </div>
+                <div id="noRecipesMessage" class="text-center" style="display: none;">
+                    <p>There are no recipes to show.</p>
+                    <p>Share a few of your own or try some of these:</p>
+                    <ul>
+                        <li>Classic Spaghetti Bolognese</li>
+                        <li>Homemade Pizza with Fresh Ingredients</li>
+                        <li>Grilled Salmon with Lemon and Dill</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src='https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js'></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        function appendRecipeCard(container, recipe) {
+            var recipeCard = `
+                <div class="col-md-4">
+                    <div class="card recipe-card" data-id="${recipe.id}">
+                        <div class="card-body">
+                            <h6 class="card-title">${recipe.name}</h6>
+                            <p class="card-text">${recipe.description}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.append(recipeCard);
+        }
+
+        $.ajax({
+            type: "GET",
+            url: "/users/getAll",
+            success: function(recipes) {
+                var recipeList = $("#recipeList");
+                var featuredRecipeContainer = $("#featuredRecipe");
+                var popularRecipesContainer = $("#popularRecipes");
+
+                if (recipes.length > 0) {
+                    // Assume the first recipe is the featured one
+                    appendRecipeCard(featuredRecipeContainer, recipes[0]);
+
+                    // Assume the next two recipes are the popular ones
+                    for (var i = 1; i < Math.min(3, recipes.length); i++) {
+                        appendRecipeCard(popularRecipesContainer, recipes[i]);
+                    }
+
+                    // Append the rest to the all recipes section
+                    recipes.slice(3).forEach(function(recipe) {
+                        appendRecipeCard(recipeList, recipe);
+                    });
+
+                    // Add click event to each recipe card
+                    $(".recipe-card").on("click", function() {
+                        var recipeId = $(this).data("id");
+                        window.location.href = `recipeDetail.html?id=${recipeId}`;
+                    });
+                } else {
+                    $("#noRecipesMessage").show();
+                }
+            },
+            error: function(error) {
+                console.log("Error fetching recipes", error);
+                $("#noRecipesMessage").show();
+            }
+        });
+    });
+</script>
+</body>
+</html>
