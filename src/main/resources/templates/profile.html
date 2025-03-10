@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <!-- FontAwesome -->
+    <script src="https://kit.fontawesome.com/220eb3bc4c.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .profile-container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .profile-header {
+            text-align: center;
+        }
+        .profile-header img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+        .profile-buttons {
+            text-align: center;
+        }
+        .profile-buttons button {
+            margin: 5px;
+        }
+        .recipe-list {
+            margin-top: 20px;
+        }
+    </style>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/index">🍽️ Recipe Sharing</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/index">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/recipes">Recipes</a></li>
+                <li class="nav-item"><a class="nav-link" href="/favorites">Favorites</a></li>
+                <li class="nav-item"><a class="nav-link" href="/add-recipe">Add Recipe</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="logout()">Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Profile Container -->
+<div class="profile-container">
+    <div class="profile-header">
+        <img src="https://via.placeholder.com/120" alt="User Avatar">
+        <h2 id="userName">User Name</h2>
+        <p id="userEmail">user@example.com</p>
+    </div>
+
+    <div class="profile-buttons">
+        <input type="text" id="updatedName" class="form-control" placeholder="Enter new name">
+        <button class="btn btn-success mt-2" onclick="updateProfile()">Update Profile</button>
+        <button class="btn btn-danger" onclick="logout()">Logout</button>
+    </div>
+
+    <hr>
+
+    <h3>My Recipes</h3>
+    <div id="user-recipes" class="recipe-list"></div>
+
+    <hr>
+
+    <h3>My Favorites</h3>
+    <div id="user-favorites" class="recipe-list"></div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-dark text-white text-center py-3">
+    <p>&copy; 2025 Recipe Sharing. All Rights Reserved.</p>
+</footer>
+<script>
+    function updateProfile() {
+        let userId = localStorage.getItem("userID"); // Get logged-in user ID
+        let newName = $("#updatedName").val(); // Get input field value
+
+        if (!newName) {
+            alert("Please enter a name!");
+            return;
+        }
+
+        $.ajax({
+            url: "/profile/update/" + userId,
+            type: "POST",
+            data: { fullName: newName },
+            success: function(response) {
+                alert("Profile updated successfully!");
+                $("#userName").text(newName); // Update the displayed name
+            },
+            error: function() {
+                alert("Error updating profile.");
+            }
+        });
+    }
+</script>
+
+<script>
+    function logout() {
+        localStorage.removeItem("userID");
+        window.location.href = "login.html";
+    }
+</script>
+<script>
+
+    $(document).ready(function () {
+    let userId = localStorage.getItem("userID");
+
+    if (!userId) {
+        window.location.href = "/login";
+        return;
+    }
+
+    // ✅ Load user profile details
+    loadUserProfile(userId);
+
+    // ✅ Load user-created recipes
+    loadUserRecipes(userId);
+
+    // ✅ Load user favorite recipes
+    loadUserFavorites(userId);
+});
+
+function loadUserProfile(userId) {
+    $.ajax({
+        url: "/user/" + userId,
+        type: "GET",
+        success: function (user) {
+            $("#userName").text(user.fullName);
+            $("#userEmail").text(user.email);
+        },
+        error: function () {
+            alert("Error fetching user details.");
+        }
+    });
+}
+
+function loadUserRecipes(userId) {
+    $.ajax({
+        url: "/api/recipes/user/" + userId,  // Filter recipes by userId
+        type: "GET",
+        success: function (recipes) {
+            let html = "";
+            if (recipes.length === 0) {
+                html = "<p>You have not added any recipes yet.</p>";
+            } else {
+                recipes.forEach(recipe => {
+                    html += `
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">${recipe.name}</h5>
+                                <p class="card-text">${recipe.description.substring(0, 100)}...</p>
+                                <button class="btn btn-danger" onclick="deleteRecipe(${recipe.id})">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            $("#user-recipes").html(html);
+        },
+        error: function () {
+            $("#user-recipes").html("<p>Error fetching recipes.</p>");
+        }
+    });
+
+}
+
+function loadUserFavorites(userId) {
+    $.ajax({
+        url: "/favorites/user/" + userId,
+        type: "GET",
+        success: function (favorites) {
+            let html = "";
+            if (favorites.length === 0) {
+                html = "<p>No favorite recipes yet.</p>";
+            } else {
+                favorites.forEach(recipe => {
+                    html += `
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">${recipe.name}</h5>
+                                <p class="card-text">${recipe.description.substring(0, 100)}...</p>
+                                <button class="btn btn-warning" onclick="removeFavorite(${recipe.id})">Remove Favorite</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            $("#user-favorites").html(html);
+        },
+        error: function () {
+            $("#user-favorites").html("<p>Error fetching favorites.</p>");
+        }
+    });
+}
+
+function removeFromFavorites(recipeId) {
+    let userId = localStorage.getItem("userID");
+
+    if (!userId) {
+        alert("You need to be logged in to remove favorites.");
+        return;
+    }
+
+    $.ajax({
+        url: `/favorites/remove/${userId}/${recipeId}`,
+        type: "DELETE",
+        success: function(response) {
+            alert(response);
+            let btn = $(`#favorite-btn-${recipeId}`);
+            btn.toggleClass("btn-success btn-warning");
+            btn.text("⭐ Favorite");
+        },
+        error: function(xhr, status, error) {
+            alert("Failed to remove recipe from favorites.");
+            console.error("AJAX request failed:", status, error);
+        }
+    });
+}
+
+function logout() {
+    localStorage.clear();
+    window.location.href = "/login";
+}
+
+function deleteRecipe(recipeId) {
+    $.ajax({
+        url: "/recipes/delete/" + recipeId,
+        type: "DELETE",
+        success: function() {
+            alert("Recipe deleted successfully!");
+            loadUserRecipes(localStorage.getItem("userID"));
+        },
+        error: function() {
+            alert("Error deleting recipe.");
+        }
+    });
+}
+
+
+</script>
+
+</body>
+</html>

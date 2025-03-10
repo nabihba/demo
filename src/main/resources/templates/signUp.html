@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        body {
+            background-image: url('/images/food.webp'); /* Ensure this image is in /static/images/ */
+            background-repeat: no-repeat;
+            background-size: cover;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            color: #4CAF50;
+            margin: 10px 0 5px;
+        }
+        input, textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .message {
+            margin-top: 20px;
+            color: #555;
+        }
+        .message a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .message a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+
+
+
+    <script>
+        $(document).ready(function () {
+            $("#userForm").submit(function (event) {
+                event.preventDefault(); // Prevent default form submission
+
+                let user = {
+                    fullName: $("#fullName").val(),
+                    userName: $("#userName").val(),
+                    email: $("#email").val(),
+                    address: $("#address").val(),
+                    phoneNumber: $("#phoneNumber").val(),
+                    password: $("#password").val()
+                };
+
+                $.ajax({
+                    type: "POST",
+                    url: "/user/register",
+                    contentType: "application/json",
+                    data: JSON.stringify(user),
+                    success: function (response) {
+                        alert("User registered successfully!");
+                        window.location.href = "/login"; // Redirect to login page
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Error registering user: " + xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+
+
+</head>
+<body>
+<div class="container">
+    <h1>Sign Up</h1>
+    <form id="userForm">
+        <input type="text" id="fullName" name="fullName" placeholder="Full Name" required>
+        <input type="text" id="userName" name="userName" placeholder="Username" required>
+        <input type="text" id="address" name="address" placeholder="Address" required>
+        <input type="text" id="phoneNumber" name="phoneNumber" placeholder="Phone Number" required>
+        <input type="email" id="email" name="email" placeholder="Email" required>
+        <input type="password" id="password" name="password" placeholder="Password" required>
+        <button type="submit">Sign Up</button>
+    </form>
+    <div class="message">
+        Already have an account? <a href="/login">Log In</a>
+    </div>
+</div>
+</body>
+</html>

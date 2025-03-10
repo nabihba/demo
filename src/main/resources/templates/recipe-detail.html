@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Details</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div class="container mt-5">
+    <h1 id="recipe-name"></h1>
+    <p id="recipe-description"></p>
+    <h3>Ingredients</h3>
+    <p id="recipe-ingredients"></p>
+    <h3>Instructions</h3>
+    <p id="recipe-instructions"></p>
+    <iframe id="recipe-video" width="100%" height="400"></iframe>
+</div>
+<div id="comments-section">
+    <h4>Comments</h4>
+    <div id="comments-container"></div>
+    <input type="text" id="comment-input" placeholder="Write a comment...">
+    <button onclick="addComment()">Post</button>
+</div>
+
+<script>
+    function loadComments(recipeId) {
+        $.ajax({
+            url: `/comments/${recipeId}`,
+            type: "GET",
+            success: function(data) {
+                let commentsHTML = "";
+                data.forEach(comment => {
+                    commentsHTML += `<p><strong>${comment.user.username}</strong>: ${comment.content}</p>`;
+                });
+                $("#comments-container").html(commentsHTML);
+            }
+        });
+    }
+
+    function addComment() {
+        let recipeId = $("#recipeId").val();
+        let userId = $("#userId").val();
+        let content = $("#comment-input").val();
+
+        $.ajax({
+            url: `/comments/add`,
+            type: "POST",
+            data: { userId, recipeId, content },
+            success: function() {
+                alert("Comment added!");
+                loadComments(recipeId);
+            }
+        });
+    }
+</script>
+
+
+<script>
+    $(document).ready(function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const recipeId = urlParams.get('id');
+
+        $.ajax({
+            url: `/user/findRecipesById/${recipeId}`,
+            method: "GET",
+            success: function(recipe) {
+                $("#recipe-name").text(recipe.name);
+                $("#recipe-description").text(recipe.description);
+                $("#recipe-ingredients").text(recipe.ingredients);
+                $("#recipe-instructions").text(recipe.instructions);
+                $("#recipe-video").attr("src", recipe.youtubeUrlbeUrl);
+            }
+        });
+    });
+</script>
+</body>
+</html>

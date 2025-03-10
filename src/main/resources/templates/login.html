@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log In</title>
+    <style>
+        body {
+            background-image: url('food2.webp');
+            background-repeat: no-repeat;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            color: #4CAF50;
+            margin: 10px 0 5px;
+        }
+        input[type="email"], input[type="password"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .message {
+            margin-top: 20px;
+            color: #555;
+        }
+        .message a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .message a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function(){
+    $("#logForm").submit(function(event){
+        event.preventDefault();
+        var email = $("#email").val();
+        var password = $("#password").val();
+
+        $.ajax({
+            type: "POST",
+            url: "/login",
+            contentType: "application/json",  // Send data as JSON
+            data: JSON.stringify({ email: email, password: password }), // Convert to JSON string
+            success: function(response) {
+                if (response.id) {
+                    localStorage.setItem("userID", response.id);
+                    window.location.href = "/h";
+                } else {
+                    alert("Login failed, check your email or password");
+                }
+            },
+            error: function(xhr, status, error) {
+                alert("Login failed. Please check your credentials.");
+            }
+        });
+    });
+});
+
+
+    </script>
+</head>
+<body>
+<div class="container">
+    <h1>Log In</h1>
+    <form id="logForm">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+
+        <button type="submit">Log In</button>
+    </form>
+    <div class="message">
+        Don't have an account? <a href="/user/register">Sign Up</a>
+    </div>
+</div>
+</body>
+</html>

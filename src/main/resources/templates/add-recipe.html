@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Recipe</title>
+    <style>
+        /* General styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin: 20px 0;
+            text-align: center;
+            color: #007bff;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        form input, form textarea, form select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        form textarea {
+            height: 150px;
+        }
+
+        form button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        form button:hover {
+            background-color: #0056b3;
+        }
+
+        input[type="file"] {
+            border: none;
+            padding: 10px;
+            background-color: #f8f9fa;
+        }
+
+        input[type="file"]:hover {
+            background-color: #e9ecef;
+        }
+
+        /* Responsive Styles */
+        @media screen and (max-width: 768px) {
+            form {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<h2>Add a Recipe</h2>
+<form id="recipe-form">
+    <input type="text" id="name" placeholder="Recipe Name" required>
+    <textarea id="description" placeholder="Description" required></textarea>
+    <textarea id="ingredients" placeholder="Ingredients (comma-separated)" required></textarea>
+    <textarea id="instructions" placeholder="Instructions" required></textarea>
+    <input type="text" id="youtubeUrl" placeholder="YouTube Video URL">
+
+    <!-- Category Selection -->
+    <select id="category" required>
+        <option value="Breakfast">Breakfast</option>
+        <option value="Lunch">Lunch</option>
+        <option value="Dinner">Dinner</option>
+        <option value="Dessert">Dessert</option>
+    </select>
+
+    <input type="file" id="recipe-image" accept="image/*" required>
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+    document.getElementById("recipe-form").addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        let formData = new FormData();
+        formData.append("name", document.getElementById("name").value);
+        formData.append("description", document.getElementById("description").value);
+        formData.append("ingredients", document.getElementById("ingredients").value);
+        formData.append("instructions", document.getElementById("instructions").value);
+        formData.append("category", document.getElementById("category").value);
+        formData.append("youtubeUrl", document.getElementById("youtubeUrl").value);
+
+        let fileInput = document.getElementById("recipe-image");
+        if (!fileInput.files || fileInput.files.length === 0) {
+            alert("Please select an image.");
+            return;
+        }
+        formData.append("image", fileInput.files[0]);
+
+        try {
+            let response = await fetch("/api/recipes/add", {
+                method: "POST",
+                body: formData
+            });
+
+            let result = await response.json(); // Corrected to parse JSON response
+
+            if (response.ok) {
+                alert(result.message); // Shows success message from backend
+                window.location.href = "/h"; // Redirect to homepage
+            } else {
+                alert("Failed to add recipe: " + (result.error || "Unknown error"));
+            }
+        } catch (error) {
+            console.error("Error adding recipe:", error);
+            alert("An error occurred while adding the recipe.");
+        }
+    });
+</script>
+</body>
+</html>
